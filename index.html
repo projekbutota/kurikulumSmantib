@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portal Dokumen & Catatan — Dashboard</title>
+  <title>Kurikulum Smantib — Portal Perangkat & Dokumen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     :root {
       --primary: #696cff;
@@ -16,608 +17,147 @@
       --success-soft: #e8fadf;
       --info: #03c3ec;
       --info-soft: #d7f5fc;
+      --warning: #ffab00;
+      --warning-soft: #fff2d6;
       --danger: #ff3e1d;
       --danger-soft: #ffe0db;
       --bg-body: #f5f5f9;
       --bg-card: #ffffff;
-      --text-heading: #566a7f;
+      --text-heading: #4b5c6b;
       --text-body: #697a8d;
       --text-muted: #a1acb8;
-      --border-color: #d9dee3;
-      --shadow: 0 2px 6px 0 rgba(67, 89, 113, 0.12);
-      --radius: 0.5rem;
+      --border-color: #e4e6eb;
+      --shadow: 0 2px 8px rgba(67, 89, 113, 0.09);
+      --radius: 0.65rem;
     }
 
     * { box-sizing: border-box; font-family: 'Public Sans', system-ui, -apple-system, sans-serif; }
     html { scroll-behavior: smooth; }
     body { margin: 0; background: var(--bg-body); color: var(--text-body); display: flex; min-height: 100vh; }
 
-    /* ================= SIDEBAR KIRI ================= */
+    /* ================= SIDEBAR PC & DRAWER HP ================= */
+    .sidebar-backdrop {
+      display: none; position: fixed; inset: 0; background: rgba(34, 48, 62, 0.45);
+      z-index: 998; backdrop-filter: blur(2px);
+    }
+    .sidebar-backdrop.show { display: block; }
+
     .sidebar {
-      width: 260px; background: var(--bg-card); box-shadow: 0 0.125rem 0.375rem 0 rgba(161, 172, 184, 0.12);
-      display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100;
-      transition: transform 0.25s ease;
+      width: 260px; background: var(--bg-card); border-right: 1px solid var(--border-color);
+      display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0;
+      z-index: 999; transition: transform 0.25s ease;
     }
     .brand {
-      display: flex; align-items: center; gap: 0.65rem; padding: 1.35rem 1.5rem;
-      text-decoration: none; color: var(--text-heading); font-weight: 700; font-size: 1.45rem; letter-spacing: -0.5px;
+      display: flex; align-items: center; gap: 0.75rem; padding: 1.35rem 1.4rem;
+      text-decoration: none; color: var(--text-heading); font-weight: 700; font-size: 1.2rem;
+      border-bottom: 1px solid #f1f2f6;
     }
     .brand-logo {
-      width: 30px; height: 30px; border-radius: 8px; background: var(--primary);
-      display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 1.1rem;
-      box-shadow: 0 2px 6px rgba(105, 108, 255, 0.4);
+      width: 34px; height: 34px; border-radius: 9px; background: var(--primary);
+      display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 1rem;
+      box-shadow: 0 3px 8px rgba(105, 108, 255, 0.35); flex-shrink: 0;
     }
-    .menu-list { list-style: none; padding: 0 0.85rem; margin: 0.25rem 0; flex: 1; }
+    .menu-list { list-style: none; padding: 0.75rem 0.85rem; margin: 0; flex: 1; overflow-y: auto; }
     .menu-header {
-      font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
-      color: var(--text-muted); padding: 1.1rem 0.85rem 0.45rem;
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--text-muted); padding: 1rem 0.85rem 0.45rem;
     }
-    .menu-item { margin-bottom: 0.25rem; position: relative; }
+    .menu-item { margin-bottom: 0.3rem; position: relative; }
     .menu-link {
-      display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.9rem;
-      border-radius: 0.375rem; text-decoration: none; color: var(--text-body);
-      font-size: 0.93rem; font-weight: 500; transition: all 0.15s ease;
+      display: flex; align-items: center; gap: 0.75rem; padding: 0.68rem 0.9rem;
+      border-radius: 0.45rem; text-decoration: none; color: var(--text-body);
+      font-size: 0.92rem; font-weight: 500; transition: all 0.15s ease; cursor: pointer;
+      border: none; background: transparent; width: 100%; text-align: left;
     }
-    .menu-link:hover { background: rgba(67, 89, 113, 0.04); color: var(--text-heading); }
+    .menu-link:hover { background: #f4f5f8; color: var(--text-heading); }
     .menu-item.active .menu-link {
       background: var(--primary-soft); color: var(--primary); font-weight: 600;
     }
     .menu-item.active::after {
-      content: ""; position: absolute; right: -0.85rem; top: 15%; height: 70%; width: 4px;
+      content: ""; position: absolute; right: -0.85rem; top: 18%; height: 64%; width: 4px;
       background: var(--primary); border-radius: 4px 0 0 4px;
     }
     .sidebar-card {
       margin: 1rem; padding: 1.15rem; border-radius: var(--radius);
-      background: linear-gradient(135deg, #f4f4ff 0%, #eaeaff 100%);
-      text-align: center; border: 1px solid rgba(105, 108, 255, 0.15);
+      background: linear-gradient(135deg, #f3f3ff 0%, #e7e7ff 100%);
+      text-align: center; border: 1px solid rgba(105, 108, 255, 0.18);
     }
     .sidebar-card h4 { margin: 0 0 0.35rem; color: var(--text-heading); font-size: 0.95rem; }
-    .sidebar-card p { margin: 0 0 0.85rem; font-size: 0.8rem; color: var(--text-body); line-height: 1.45; }
+    .sidebar-card p { margin: 0 0 0.85rem; font-size: 0.78rem; color: var(--text-body); line-height: 1.45; }
 
-    /* ================= LAYOUT UTAMA ================= */
+    /* ================= AREA KONTEN UTAMA ================= */
     .main-wrapper { flex: 1; margin-left: 260px; display: flex; flex-direction: column; min-width: 0; }
-    .content-container { max-width: 1360px; width: 100%; margin: 0 auto; padding: 1.25rem 1.5rem 2.5rem; }
+    .content-container { max-width: 1380px; width: 100%; margin: 0 auto; padding: 1.25rem 1.5rem 3rem; }
 
-    /* ================= TOP NAVBAR ================= */
+    /* ================= NAVBAR ATAS ================= */
     .navbar {
-      background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow);
-      padding: 0.65rem 1.25rem; display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 1.5rem; gap: 1rem;
+      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+      padding: 0.65rem 1.2rem; display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.4rem; gap: 0.75rem; position: sticky; top: 0.75rem; z-index: 90;
     }
     .mobile-toggle {
-      display: none; background: none; border: none; font-size: 1.35rem; color: var(--text-heading); cursor: pointer;
+      display: none; background: #f4f5f8; border: none; width: 38px; height: 38px;
+      border-radius: 8px; font-size: 1.25rem; color: var(--text-heading); cursor: pointer;
     }
-    .search-box { display: flex; align-items: center; gap: 0.6rem; flex: 1; max-width: 420px; }
+    .search-box { display: flex; align-items: center; gap: 0.55rem; flex: 1; max-width: 440px; }
     .search-box input {
-      border: none; outline: none; font-size: 0.93rem; color: var(--text-heading); width: 100%; background: transparent;
+      border: none; outline: none; font-size: 0.92rem; color: var(--text-heading); width: 100%; background: transparent;
     }
     .search-box input::placeholder { color: var(--text-muted); }
     .kbd-badge {
-      font-size: 0.72rem; color: var(--text-muted); border: 1px solid var(--border-color);
+      font-size: 0.7rem; color: var(--text-muted); border: 1px solid var(--border-color);
       padding: 0.15rem 0.45rem; border-radius: 4px; white-space: nowrap;
     }
-    .nav-actions { display: flex; align-items: center; gap: 0.85rem; }
+    .nav-actions { display: flex; align-items: center; gap: 0.6rem; }
     .icon-btn {
-      width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent;
+      width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--border-color); background: #fff;
       color: var(--text-heading); display: grid; place-items: center; cursor: pointer;
-      position: relative; transition: background 0.15s; text-decoration: none;
+      transition: all 0.15s;
     }
-    .icon-btn:hover { background: var(--bg-body); }
-    .badge-dot {
-      position: absolute; top: 6px; right: 6px; width: 8px; height: 8px;
-      border-radius: 50%; background: var(--danger); border: 2px solid #fff;
-    }
-    .avatar {
-      width: 38px; height: 38px; border-radius: 50%; background: var(--primary-soft);
-      color: var(--primary); font-weight: 700; display: grid; place-items: center;
-      position: relative; font-size: 0.9rem;
-    }
-    .avatar::after {
-      content: ""; position: absolute; bottom: 1px; right: 1px; width: 9px; height: 9px;
-      background: var(--success); border-radius: 50%; border: 2px solid #fff;
-    }
+    .icon-btn:hover { background: var(--bg-body); color: var(--primary); }
+    .spin { animation: spin 0.8s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* ================= GRID ATAS (WELCOME + 4 STAT CARDS) ================= */
-    .top-grid {
-      display: grid; grid-template-columns: 1.85fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;
+    /* ================= TOMBOL ================= */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+      padding: 0.55rem 1.05rem; border-radius: 0.45rem; border: none; font-size: 0.86rem;
+      font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.15s ease; white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--primary); color: #fff; box-shadow: 0 3px 8px rgba(105, 108, 255, 0.35);
+    }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-soft-primary { background: var(--primary-soft); color: var(--primary); }
+    .btn-soft-primary:hover { background: #d8d9ff; }
+    .btn-soft-info { background: var(--info-soft); color: #028fb0; }
+    .btn-soft-info:hover { background: #bfeaf6; }
+    .btn-outline { background: #fff; border: 1px solid var(--border-color); color: var(--text-body); }
+    .btn-outline:hover { background: var(--bg-body); color: var(--text-heading); }
+
+    /* ================= HERO BANNER & RINGKASAN ================= */
+    .hero-grid {
+      display: grid; grid-template-columns: 1.65fr 1fr; gap: 1.4rem; margin-bottom: 1.4rem;
     }
     .card {
       background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.35rem;
     }
     .welcome-card {
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.5rem 1.75rem;
-      overflow: hidden;
+      display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; padding: 1.5rem 1.75rem;
     }
-    .welcome-text h2 { margin: 0 0 0.5rem; color: var(--primary); font-size: 1.3rem; font-weight: 600; }
-    .welcome-text p { margin: 0 0 1.15rem; color: var(--text-body); font-size: 0.92rem; max-width: 440px; line-height: 1.55; }
-    .welcome-illustration { flex-shrink: 0; width: 165px; }
+    .welcome-badge {
+      display: inline-block; background: var(--primary-soft); color: var(--primary);
+      font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 20px; margin-bottom: 0.6rem;
+    }
+    .welcome-text h1 { margin: 0 0 0.5rem; color: var(--text-heading); font-size: 1.4rem; font-weight: 700; }
+    .welcome-text p { margin: 0 0 1.15rem; color: var(--text-body); font-size: 0.9rem; line-height: 1.55; max-width: 480px; }
+    .hero-btns { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .welcome-illustration { width: 155px; flex-shrink: 0; }
 
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
-    .stat-card { padding: 1.15rem; display: flex; flex-direction: column; justify-content: space-between; }
-    .stat-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+    .mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .stat-box { padding: 1.1rem; display: flex; flex-direction: column; justify-content: space-between; }
     .stat-icon {
-      width: 38px; height: 38px; border-radius: 0.375rem; display: grid; place-items: center;
+      width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; margin-bottom: 0.65rem;
     }
-    .stat-label { font-size: 0.85rem; color: var(--text-body); font-weight: 500; margin-bottom: 0.25rem; }
-    .stat-value { font-size: 1.4rem; font-weight: 700; color: var(--text-heading); margin-bottom: 0.35rem; }
-    .stat-trend { font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; gap: 0.25rem; }
-
-    /* ================= GRID UTAMA (DOKUMEN & FORM) ================= */
-    .workspace-grid {
-      display: grid; grid-template-columns: 1.35fr 1fr; gap: 1.5rem; align-items: start; margin-bottom: 1.5rem;
-    }
-    .card-header-bar {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.15rem;
-      flex-wrap: wrap; gap: 0.75rem;
-    }
-    .card-title-main { margin: 0; font-size: 1.12rem; font-weight: 600; color: var(--text-heading); }
-    .card-subtitle { margin: 0.2rem 0 0; font-size: 0.82rem; color: var(--text-muted); }
-
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
-      padding: 0.5rem 1rem; border-radius: 0.375rem; border: none; font-size: 0.85rem;
-      font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.15s ease;
-    }
-    .btn-primary {
-      background: var(--primary); color: #fff; box-shadow: 0 0.125rem 0.25rem 0 rgba(105, 108, 255, 0.4);
-    }
-    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
-    .btn-soft-primary { background: var(--primary-soft); color: var(--primary); font-weight: 600; }
-    .btn-soft-primary:hover { background: #dcdcff; }
-    .btn-soft-info { background: var(--info-soft); color: #029ec0; font-weight: 600; }
-    .btn-soft-info:hover { background: #c2eef8; }
-    .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-body); }
-    .btn-outline:hover { background: var(--bg-body); color: var(--text-heading); }
-
-    /* ================= ITEM CATATAN DOKUMEN ================= */
-    .doc-item {
-      border: 1px solid #ebeef1; border-radius: var(--radius); padding: 1.15rem;
-      margin-bottom: 1rem; background: #fff; transition: all 0.2s ease;
-    }
-    .doc-item:hover { border-color: #cfd5dc; box-shadow: 0 3px 10px rgba(67, 89, 113, 0.08); }
-    .doc-item:target { border: 2px solid var(--primary); background: #f8f8ff; }
-    .doc-top {
-      display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.75rem;
-    }
-    .doc-user { display: flex; align-items: center; gap: 0.75rem; }
-    .doc-avatar {
-      width: 38px; height: 38px; border-radius: 0.375rem; background: var(--primary-soft);
-      color: var(--primary); font-weight: 700; display: grid; place-items: center; flex-shrink: 0;
-    }
-    .doc-title { font-weight: 600; color: var(--text-heading); font-size: 0.98rem; margin: 0; }
-    .doc-time { font-size: 0.78rem; color: var(--text-muted); }
-    .doc-fields { background: #fafafc; border-radius: 0.375rem; padding: 0.75rem 0.9rem; margin-bottom: 0.85rem; }
-    .field-row { margin-bottom: 0.45rem; font-size: 0.88rem; }
-    .field-row:last-child { margin-bottom: 0; }
-    .field-label { font-weight: 600; color: var(--text-heading); font-size: 0.8rem; }
-    .field-val { color: var(--text-body); white-space: pre-wrap; margin-top: 0.1rem; }
-    .doc-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-
-    iframe.form-frame { width: 100%; height: 640px; border: none; border-radius: 0.375rem; }
-    .empty-state { text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-size: 0.92rem; }
-
-    /* ================= RESPONSIVE ================= */
-    @media (max-width: 1100px) {
-      .top-grid, .workspace-grid { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 850px) {
-      .sidebar { transform: translateX(-100%); }
-      .sidebar.open { transform: translateX(0); }
-      .main-wrapper { margin-left: 0; }
-      .mobile-toggle { display: block; }
-      .welcome-illustration { display: none; }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <a href="#top" class="brand">
-      <div class="brand-logo">S</div>
-      <span>sneat<span style="color:var(--primary);font-weight:500;">docs</span></span>
-    </a>
-
-    <ul class="menu-list">
-      <li class="menu-item active">
-        <a href="#top" class="menu-link">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          Dashboard
-        </a>
-      </li>
-      <li class="menu-item">
-        <a href="#section-form" class="menu-link">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Kirim Dokumen
-        </a>
-      </li>
-
-      <li class="menu-header">Arsip & Interaksi</li>
-
-      <li class="menu-item">
-        <a href="#section-dokumen" class="menu-link">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Semua Catatan
-        </a>
-      </li>
-      <li class="menu-item">
-        <a href="#section-komentar" class="menu-link">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-          Komentar Publik
-        </a>
-      </li>
-      <li class="menu-item">
-        <a href="https://forms.gle/toSSi3rZTxABJPHz9" target="_blank" class="menu-link">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Buka Form Tab Baru
-        </a>
-      </li>
-    </ul>
-
-    <div class="sidebar-card">
-      <h4>Bagikan Dokumen</h4>
-      <p>Unggah berkas lewat form agar otomatis tampil dan dapat diunduh publik.</p>
-      <a href="#section-form" class="btn btn-primary" style="width:100%;">Unggah Sekarang</a>
-    </div>
-  </aside>
-
-  <!-- KONTEN KANAN -->
-  <div class="main-wrapper" id="top">
-    <div class="content-container">
-
-      <!-- TOP NAVBAR -->
-      <header class="navbar">
-        <div style="display:flex; align-items:center; gap:0.75rem; flex:1;">
-          <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-          <div class="search-box">
-            <svg width="18" height="18" fill="none" stroke="#a1acb8" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="searchInput" placeholder="Cari catatan, nama, atau dokumen..." oninput="filterCatatan()" />
-            <span class="kbd-badge">⌘K</span>
-          </div>
-        </div>
-
-        <div class="nav-actions">
-          <button class="icon-btn" onclick="muatData()" title="Muat Ulang Data">
-            <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-          </button>
-          <a href="#section-dokumen" class="icon-btn" title="Catatan Baru">
-            <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            <span class="badge-dot"></span>
-          </a>
-          <div class="avatar" title="Portal Aktif">GD</div>
-        </div>
-      </header>
-
-      <!-- BARIS ATAS: WELCOME BANNER + 4 KARTU STATISTIK -->
-      <section class="top-grid">
-        <div class="card welcome-card">
-          <div class="welcome-text">
-            <h2>Selamat Datang di Portal Dokumen! 🎉</h2>
-            <p>
-              Semua catatan dan berkas yang dikirim melalui Google Form otomatis tercatat di halaman ini. Pengunjung dapat langsung mengunduh, membagikan tautan, maupun berdiskusi.
-            </p>
-            <a href="#section-form" class="btn btn-soft-primary">ISI FORMULIR SEKARANG</a>
-          </div>
-          <!-- Ilustrasi SVG bergaya Sneat -->
-          <svg class="welcome-illustration" viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="155" cy="35" r="14" stroke="#d9dee3" stroke-width="2"/>
-            <path d="M155 27v8l5 3" stroke="#a1acb8" stroke-width="2" stroke-linecap="round"/>
-            <rect x="20" y="128" width="160" height="6" rx="3" fill="#e7e7ff"/>
-            <path d="M105 68c0-14 11-24 25-24s25 10 25 24v60h-50V68z" fill="#696cff"/>
-            <circle cx="130" cy="33" r="13" fill="#ffcdb2"/>
-            <path d="M117 31c0-8 6-13 13-13s13 5 13 13c-4-3-9-4-13-4s-9 1-13 4z" fill="#32475c"/>
-            <rect x="65" y="88" width="54" height="36" rx="4" fill="#d9dee3"/>
-            <rect x="69" y="92" width="46" height="28" rx="2" fill="#ffffff"/>
-            <circle cx="92" cy="106" r="4" fill="#696cff"/>
-            <path d="M168 128c-6-12-4-24 4-32 4 10 4 22-4 32z" fill="#71dd37"/>
-            <path d="M172 128c4-10 12-16 20-16-4 8-12 14-20 16z" fill="#03c3ec"/>
-          </svg>
-        </div>
-
-        <div class="stats-grid">
-          <div class="card stat-card">
-            <div class="stat-top">
-              <div class="stat-icon" style="background:var(--success-soft); color:var(--success);">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              </div>
-              <span style="color:var(--text-muted); font-weight:700;">⋮</span>
-            </div>
-            <div>
-              <div class="stat-label">Total Catatan</div>
-              <div class="stat-value" id="statTotalCatatan">0</div>
-              <div class="stat-trend" style="color:var(--success);">↑ Tersinkron CSV</div>
-            </div>
-          </div>
-
-          <div class="card stat-card">
-            <div class="stat-top">
-              <div class="stat-icon" style="background:var(--info-soft); color:var(--info);">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              </div>
-              <span style="color:var(--text-muted); font-weight:700;">⋮</span>
-            </div>
-            <div>
-              <div class="stat-label">Dokumen Siap Unduh</div>
-              <div class="stat-value" id="statTotalFile">0</div>
-              <div class="stat-trend" style="color:var(--info);">● Google Drive</div>
-            </div>
-          </div>
-
-          <div class="card stat-card">
-            <div class="stat-top">
-              <div class="stat-icon" style="background:var(--danger-soft); color:var(--danger);">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </div>
-              <span style="color:var(--text-muted); font-weight:700;">⋮</span>
-            </div>
-            <div>
-              <div class="stat-label">Kiriman Terakhir</div>
-              <div class="stat-value" id="statTerakhir" style="font-size:1rem; padding-top:0.35rem;">-</div>
-              <div class="stat-trend" style="color:var(--text-muted);">Update Otomatis</div>
-            </div>
-          </div>
-
-          <div class="card stat-card">
-            <div class="stat-top">
-              <div class="stat-icon" style="background:var(--primary-soft); color:var(--primary);">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-              </div>
-              <span style="color:var(--text-muted); font-weight:700;">⋮</span>
-            </div>
-            <div>
-              <div class="stat-label">Status Koneksi</div>
-              <div class="stat-value" id="statStatus" style="font-size:1.1rem; padding-top:0.2rem;">Memuat...</div>
-              <div class="stat-trend" style="color:var(--primary);">● GitHub Pages</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- BARIS TENGAH: DAFTAR CATATAN (KIRI) & GOOGLE FORM (KANAN) -->
-      <section class="workspace-grid">
-        <!-- DAFTAR DOKUMEN -->
-        <div class="card" id="section-dokumen">
-          <div class="card-header-bar">
-            <div>
-              <h3 class="card-title-main">Catatan & Dokumen Terkumpul</h3>
-              <p class="card-subtitle">Klik Download untuk mengunduh berkas atau Share untuk menyalin tautan</p>
-            </div>
-            <button class="btn btn-outline" onclick="muatData()">↻ Refresh Data</button>
-          </div>
-
-          <div id="daftarCatatan">
-            <div class="empty-state">Memuat data catatan dari Google Sheets...</div>
-          </div>
-        </div>
-
-        <!-- EMBED GOOGLE FORM -->
-        <div class="card" id="section-form">
-          <div class="card-header-bar">
-            <div>
-              <h3 class="card-title-main">Formulir Pengumpulan</h3>
-              <p class="card-subtitle">Isi form di bawah untuk menambahkan catatan baru</p>
-            </div>
-            <a href="https://forms.gle/toSSi3rZTxABJPHz9" target="_blank" class="btn btn-soft-primary">↗ Tab Baru</a>
-          </div>
-
-          <iframe id="googleFormFrame" class="form-frame" src="" loading="lazy">Memuat formulir...</iframe>
-        </div>
-      </section>
-
-      <!-- BARIS BAWAH: KOMENTAR PENGUNJUNG -->
-      <section class="card" id="section-komentar">
-        <div class="card-header-bar">
-          <div>
-            <h3 class="card-title-main">Diskusi & Komentar Pengunjung</h3>
-            <p class="card-subtitle">Berikan tanggapan atau pertanyaan mengenai dokumen yang dibagikan</p>
-          </div>
-        </div>
-        <!-- Tempel kode script Giscus dari https://giscus.app di dalam div bawah ini -->
-        <div id="giscus-container">
-          <p style="font-size:0.85rem; color:var(--text-muted); margin:0;">
-            Area komentar siap dihubungkan dengan widget Giscus / Disqus.
-          </p>
-        </div>
-      </section>
-
-    </div>
-  </div>
-
-  <script>
-    // =========================================================================
-    // KONFIGURASI: TEMPEL 2 LINK KAMU DI SINI
-    // =========================================================================
-    const GOOGLE_FORM_EMBED_URL = "TEMPEL_LINK_SRC_IFRAME_GOOGLE_FORM_DISINI";
-    const GOOGLE_SHEETS_CSV_URL = "TEMPEL_LINK_CSV_PUBLISH_TO_WEB_DISINI";
-    // =========================================================================
-
-    document.getElementById("googleFormFrame").src = GOOGLE_FORM_EMBED_URL;
-    let semuaCatatan = [];
-
-    // Pintasan keyboard Cmd+K / Ctrl+K untuk fokus ke kolom pencarian navbar
-    document.addEventListener("keydown", (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        document.getElementById("searchInput").focus();
-      }
-    });
-
-    async function muatData() {
-      const container = document.getElementById("daftarCatatan");
-      const statStatus = document.getElementById("statStatus");
-      container.innerHTML = '<div class="empty-state">Sedang menyinkronkan data terbaru...</div>';
-
-      try {
-        const urlAntiCache = GOOGLE_SHEETS_CSV_URL + (GOOGLE_SHEETS_CSV_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
-        const response = await fetch(urlAntiCache);
-        const csvText = await response.text();
-        const rows = parseCSV(csvText);
-
-        statStatus.textContent = "Terhubung";
-        statStatus.style.color = "var(--success)";
-
-        if (rows.length <= 1) {
-          container.innerHTML = '<div class="empty-state">Belum ada dokumen yang dikumpulkan. Silakan isi formulir di samping!</div>';
-          return;
-        }
-
-        const headers = rows[0];
-        semuaCatatan = [];
-        let totalFileCount = 0;
-
-        for (let i = 1; i < rows.length; i++) {
-          const row = rows[i];
-          if (!row[0] && row.join("").trim() === "") continue;
-
-          const waktu = row[0] || "";
-          const textFields = [];
-          const fileLinks = [];
-
-          for (let c = 1; c < headers.length; c++) {
-            const val = (row[c] || "").trim();
-            const label = (headers[c] || `Kolom ${c}`).trim();
-            if (!val) continue;
-
-            if (val.includes("drive.google.com")) {
-              const parts = val.split(",");
-              parts.forEach((part, idx) => {
-                const idMatch = part.match(/[-\w]{25,}/);
-                if (idMatch) {
-                  totalFileCount++;
-                  fileLinks.push({
-                    label: parts.length > 1 ? `Berkas ${idx + 1}` : "Dokumen",
-                    downloadUrl: `https://drive.google.com/uc?export=download&id=${idMatch[0]}`,
-                    previewUrl: `https://drive.google.com/file/d/${idMatch[0]}/view`
-                  });
-                }
-              });
-            } else {
-              textFields.push({ label, val });
-            }
-          }
-
-          semuaCatatan.push({
-            id: `doc-${i}`,
-            waktu,
-            judul: textFields.length > 0 ? textFields[0].val : `Kiriman #${i}`,
-            detail: textFields.slice(1),
-            files: fileLinks
-          });
-        }
-
-        semuaCatatan.reverse();
-
-        // Update 4 kartu statistik di bagian atas
-        document.getElementById("statTotalCatatan").textContent = semuaCatatan.length;
-        document.getElementById("statTotalFile").textContent = totalFileCount;
-        if (semuaCatatan.length > 0) {
-          document.getElementById("statTerakhir").textContent = semuaCatatan[0].waktu.split(" ")[0] || "Baru saja";
-        }
-
-        tampilkanCatatan(semuaCatatan);
-
-        if (window.location.hash) {
-          const el = document.querySelector(window.location.hash);
-          if (el) el.scrollIntoView({ behavior: "smooth" });
-        }
-      } catch (err) {
-        statStatus.textContent = "Perlu Setup";
-        statStatus.style.color = "var(--danger)";
-        container.innerHTML = '<div class="empty-state">Data belum tampil. Pastikan link <b>GOOGLE_SHEETS_CSV_URL</b> sudah diisi dan dipublikasikan ke web (.csv).</div>';
-      }
-    }
-
-    function tampilkanCatatan(list) {
-      const container = document.getElementById("daftarCatatan");
-      if (list.length === 0) {
-        container.innerHTML = '<div class="empty-state">Tidak ditemukan catatan yang sesuai dengan kata kunci pencarian.</div>';
-        return;
-      }
-
-      container.innerHTML = list.map(item => {
-        const inisial = item.judul.substring(0, 2).toUpperCase();
-        const detailHTML = item.detail.map(d => `
-          <div class="field-row">
-            <div class="field-label">${escapeHTML(d.label)}</div>
-            <div class="field-val">${escapeHTML(d.val)}</div>
-          </div>
-        `).join("");
-
-        const filesHTML = item.files.map(f => `
-          <a href="${f.downloadUrl}" class="btn btn-primary" target="_blank">⬇ Download ${escapeHTML(f.label)}</a>
-          <a href="${f.previewUrl}" class="btn btn-soft-info" target="_blank">👁 Lihat File</a>
-        `).join("");
-
-        return `
-          <div class="doc-item" id="${item.id}">
-            <div class="doc-top">
-              <div class="doc-user">
-                <div class="doc-avatar">${escapeHTML(inisial)}</div>
-                <div>
-                  <h4 class="doc-title">${escapeHTML(item.judul)}</h4>
-                  <span class="doc-time">${escapeHTML(item.waktu)}</span>
-                </div>
-              </div>
-            </div>
-            ${detailHTML ? `<div class="doc-fields">${detailHTML}</div>` : ""}
-            <div class="doc-actions">
-              ${filesHTML}
-              <button class="btn btn-outline" onclick="bagikanCatatan('${item.id}', '${escapeHTML(item.judul)}')">🔗 Share</button>
-              <a href="#section-komentar" class="btn btn-outline">💬 Komentar</a>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function filterCatatan() {
-      const q = document.getElementById("searchInput").value.toLowerCase();
-      const hasil = semuaCatatan.filter(item =>
-        item.judul.toLowerCase().includes(q) ||
-        item.detail.some(d => d.val.toLowerCase().includes(q))
-      );
-      tampilkanCatatan(hasil);
-    }
-
-    function bagikanCatatan(id, judul) {
-      const url = `${window.location.origin}${window.location.pathname}#${id}`;
-      if (navigator.share) {
-        navigator.share({ title: judul, text: `Lihat dokumen: ${judul}`, url });
-      } else {
-        navigator.clipboard.writeText(url);
-        alert("Tautan catatan berhasil disalin!\n" + url);
-      }
-    }
-
-    function parseCSV(text) {
-      const rows = [];
-      let row = [], cell = "", inQuotes = false;
-      for (let i = 0; i < text.length; i++) {
-        const ch = text[i], next = text[i + 1];
-        if (inQuotes) {
-          if (ch === '"' && next === '"') { cell += '"'; i++; }
-          else if (ch === '"') { inQuotes = false; }
-          else { cell += ch; }
-        } else {
-          if (ch === '"') { inQuotes = true; }
-          else if (ch === ',') { row.push(cell); cell = ""; }
-          else if (ch === '\n' || (ch === '\r' && next === '\n')) {
-            row.push(cell); rows.push(row); row = []; cell = "";
-            if (ch === '\r') i++;
-          } else { cell += ch; }
-        }
-      }
-      if (cell.length > 0 || row.length > 0) { row.push(cell); rows.push(row); }
-      return rows;
-    }
-
-    function escapeHTML(str) {
-      return String(str).replace(/[&<>'"]/g, t => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-      }[t]));
-    }
-
-    muatData();
-  </script>
-</body>
-</html>
+    .stat-
