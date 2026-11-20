@@ -160,4 +160,866 @@
     .stat-icon {
       width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; margin-bottom: 0.65rem;
     }
-    .stat-
+    .stat-num { font-size: 1.45rem; font-weight: 700; color: var(--text-heading); line-height: 1.2; }
+    .stat-lbl { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; font-weight: 500; }
+
+    /* ================= 3 GRAFIK UTAMA ================= */
+    .section-head {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+      gap: 0.75rem; margin-bottom: 1rem;
+    }
+    .section-head h2 { margin: 0; font-size: 1.12rem; color: var(--text-heading); font-weight: 700; }
+    .section-head p { margin: 0.15rem 0 0; font-size: 0.82rem; color: var(--text-muted); }
+
+    .charts-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; margin-bottom: 1.75rem;
+    }
+    .chart-card { display: flex; flex-direction: column; }
+    .chart-title { font-size: 0.98rem; font-weight: 700; color: var(--text-heading); margin: 0 0 0.2rem; }
+    .chart-sub { font-size: 0.78rem; color: var(--text-muted); margin: 0 0 1rem; }
+    .chart-canvas-wrap { position: relative; height: 230px; width: 100%; }
+    .chart-empty-badge {
+      position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center; pointer-events: none; padding: 1rem;
+    }
+    .chart-empty-badge span {
+      background: #f4f5f8; color: var(--text-muted); font-size: 0.78rem; font-weight: 600;
+      padding: 0.35rem 0.75rem; border-radius: 20px; border: 1px dashed var(--border-color);
+    }
+
+    /* ================= GRID THUMBNAIL DOKUMEN ================= */
+    .docs-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1.35rem; margin-bottom: 1.75rem;
+    }
+    .thumb-card {
+      background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow);
+      overflow: hidden; display: flex; flex-direction: column; border: 1px solid transparent;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .thumb-card:hover {
+      transform: translateY(-3px); box-shadow: 0 8px 20px rgba(67, 89, 113, 0.14); border-color: #d5d7ff;
+    }
+    .thumb-card:target { border: 2px solid var(--primary); }
+
+    .thumb-preview {
+      position: relative; height: 185px; background: #eef0f6; overflow: hidden;
+      display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+    }
+    .thumb-preview img {
+      width: 100%; height: 100%; object-fit: cover; object-position: top center; transition: transform 0.3s ease;
+    }
+    .thumb-card:hover .thumb-preview img { transform: scale(1.03); }
+    .thumb-fallback {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 0.45rem; color: var(--primary); text-align: center; padding: 1rem;
+    }
+    .thumb-badge {
+      position: absolute; top: 10px; left: 10px; background: rgba(34, 48, 62, 0.78);
+      color: #fff; font-size: 0.72rem; font-weight: 600; padding: 0.25rem 0.6rem;
+      border-radius: 6px; backdrop-filter: blur(4px);
+    }
+    .thumb-overlay-btn {
+      position: absolute; inset: 0; background: rgba(105, 108, 255, 0.15);
+      display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;
+    }
+    .thumb-preview:hover .thumb-overlay-btn { opacity: 1; }
+
+    .thumb-body { padding: 1.15rem; flex: 1; display: flex; flex-direction: column; }
+    .thumb-meta { font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.35rem; display: flex; justify-content: space-between; }
+    .thumb-title { margin: 0 0 0.65rem; font-size: 1rem; font-weight: 700; color: var(--text-heading); line-height: 1.4; }
+    .thumb-details {
+      background: #fafafc; border-radius: 0.45rem; padding: 0.65rem 0.8rem; margin-bottom: 0.9rem;
+      font-size: 0.82rem; flex: 1;
+    }
+    .thumb-detail-row { margin-bottom: 0.35rem; }
+    .thumb-detail-row:last-child { margin-bottom: 0; }
+    .thumb-detail-row strong { color: var(--text-heading); }
+
+    .thumb-actions { display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.45rem; }
+    .thumb-actions .btn { padding: 0.48rem 0.65rem; font-size: 0.8rem; }
+
+    /* ================= POP-UP MODAL (FORM & PREVIEW) ================= */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(3px);
+      display: none; align-items: center; justify-content: center; z-index: 1200; padding: 1rem;
+    }
+    .modal-backdrop.open { display: flex; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal-dialog {
+      background: #fff; border-radius: 0.85rem; width: 100%; max-width: 780px; max-height: 92vh;
+      display: flex; flex-direction: column; box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25); overflow: hidden;
+    }
+    .modal-header {
+      padding: 1rem 1.35rem; border-bottom: 1px solid var(--border-color);
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: #fafafc;
+    }
+    .modal-header h3 { margin: 0; font-size: 1.05rem; color: var(--text-heading); }
+    .modal-close {
+      width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border-color);
+      background: #fff; font-size: 1.2rem; cursor: pointer; color: var(--text-heading); display: grid; place-items: center;
+    }
+    .modal-close:hover { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
+    .modal-body { flex: 1; overflow-y: auto; padding: 0; display: flex; flex-direction: column; }
+    .modal-tip {
+      background: #f3f3ff; padding: 0.65rem 1.25rem; font-size: 0.8rem; color: var(--text-heading);
+      display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;
+      border-bottom: 1px solid rgba(105, 108, 255, 0.15);
+    }
+    .modal-iframe { width: 100%; height: 68vh; min-height: 460px; border: none; }
+    .modal-footer {
+      padding: 0.85rem 1.35rem; border-top: 1px solid var(--border-color);
+      display: flex; justify-content: flex-end; gap: 0.65rem; background: #fafafc;
+    }
+
+    /* ================= MOBILE BOTTOM NAVIGATION ================= */
+    .mobile-bottom-nav {
+      display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
+      border-top: 1px solid var(--border-color); box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+      z-index: 950; padding: 0.4rem 0.25rem; justify-content: space-around; align-items: center;
+    }
+    .bottom-nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
+      text-decoration: none; color: var(--text-body); font-size: 0.7rem; font-weight: 600;
+      padding: 0.35rem 0.6rem; border-radius: 8px; border: none; background: transparent; cursor: pointer;
+    }
+    .bottom-nav-item.active, .bottom-nav-item:hover { color: var(--primary); }
+    .bottom-nav-upload {
+      background: var(--primary); color: #fff !important; padding: 0.5rem 0.85rem;
+      border-radius: 20px; box-shadow: 0 3px 8px rgba(105, 108, 255, 0.4);
+    }
+
+    /* ================= RESPONSIVE BREAKPOINTS ================= */
+    @media (max-width: 1120px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .charts-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 850px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-wrapper { margin-left: 0; }
+      .content-container { padding: 0.9rem 1rem 5.2rem; }
+      .mobile-toggle { display: grid; place-items: center; }
+      .mobile-bottom-nav { display: flex; }
+      .charts-grid { grid-template-columns: 1fr; }
+      .welcome-illustration { display: none; }
+      .kbd-badge { display: none; }
+      .nav-upload-text { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- OVERLAY SIDEBAR MOBILE -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
+
+  <!-- SIDEBAR NAVIGASI -->
+  <aside class="sidebar" id="sidebar">
+    <a href="#top" class="brand" onclick="toggleSidebar(false)">
+      <div class="brand-logo">KS</div>
+      <div>
+        <div>Kurikulum</div>
+        <div style="font-size:0.82rem; color:var(--primary); font-weight:600; margin-top:-2px;">Smantib</div>
+      </div>
+    </a>
+
+    <ul class="menu-list">
+      <li class="menu-item active" data-nav="top">
+        <a href="#top" class="menu-link" onclick="pilihMenu(this)">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard Utama
+        </a>
+      </li>
+      <li class="menu-item" data-nav="grafik">
+        <a href="#section-grafik" class="menu-link" onclick="pilihMenu(this)">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Grafik Kurikulum
+        </a>
+      </li>
+      <li class="menu-item" data-nav="dokumen">
+        <a href="#section-dokumen" class="menu-link" onclick="pilihMenu(this)">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Thumbnail Dokumen
+        </a>
+      </li>
+
+      <li class="menu-header">Aksi & Integrasi</li>
+
+      <li class="menu-item">
+        <button type="button" class="menu-link" onclick="toggleSidebar(false); bukaModalForm();">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Unggah Dokumen (Pop-up)
+        </button>
+      </li>
+      <li class="menu-item">
+        <a href="https://docs.google.com/spreadsheets/d/198dh9hp8BeRplSUdKYBlfwvWLZRG2xh-dpWKkhNRUUw/edit?usp=sharing" target="_blank" class="menu-link">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          Database Google Sheets
+        </a>
+      </li>
+      <li class="menu-item" data-nav="komentar">
+        <a href="#section-komentar" class="menu-link" onclick="pilihMenu(this)">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          Diskusi & Komentar
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-card">
+      <h4>Unggah Perangkat Ajar</h4>
+      <p>Kirim dokumen melalui Google Form agar grafik & thumbnail otomatis terbarui.</p>
+      <button type="button" class="btn btn-primary" style="width:100%;" onclick="toggleSidebar(false); bukaModalForm();">+ Unggah Sekarang</button>
+    </div>
+  </aside>
+
+  <!-- KONTEN UTAMA -->
+  <div class="main-wrapper" id="top">
+    <div class="content-container">
+
+      <!-- NAVBAR ATAS -->
+      <header class="navbar">
+        <div style="display:flex; align-items:center; gap:0.65rem; flex:1;">
+          <button class="mobile-toggle" onclick="toggleSidebar(true)" aria-label="Buka Menu">☰</button>
+          <div class="search-box">
+            <svg width="18" height="18" fill="none" stroke="#a1acb8" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchInput" placeholder="Cari guru, mata pelajaran, atau dokumen..." oninput="filterCatatan()" />
+            <span class="kbd-badge">⌘K</span>
+          </div>
+        </div>
+
+        <div class="nav-actions">
+          <button class="icon-btn" id="btnRefresh" onclick="muatData()" title="Sinkronkan Data Google Sheets">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </button>
+          <button class="btn btn-primary" onclick="bukaModalForm()">
+            <span>+</span> <span class="nav-upload-text">Unggah Dokumen</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- HERO BANNER & 4 RINGKASAN -->
+      <section class="hero-grid">
+        <div class="card welcome-card">
+          <div class="welcome-text">
+            <span class="welcome-badge">PORTAL AKADEMIK & PERANGKAT AJAR</span>
+            <h1>Kurikulum Smantib</h1>
+            <p>
+              Sistem monitoring perangkat pembelajaran terintegrasi Google Form & Google Sheets. Unggah berkas untuk memperbarui grafik mata pelajaran, kelengkapan dokumen, dan galeri pratinjau secara otomatis.
+            </p>
+            <div class="hero-btns">
+              <button class="btn btn-primary" onclick="bukaModalForm()">📤 Unggah Dokumen (Pop-up)</button>
+              <a href="#section-dokumen" class="btn btn-soft-primary">📂 Lihat Galeri Dokumen</a>
+            </div>
+          </div>
+          <svg class="welcome-illustration" viewBox="0 0 180 140" fill="none">
+            <rect x="15" y="118" width="150" height="6" rx="3" fill="#e7e7ff"/>
+            <rect x="35" y="30" width="75" height="88" rx="8" fill="#696cff"/>
+            <rect x="46" y="45" width="53" height="8" rx="4" fill="#ffffff" fill-opacity="0.85"/>
+            <rect x="46" y="61" width="38" height="6" rx="3" fill="#ffffff" fill-opacity="0.6"/>
+            <rect x="46" y="74" width="46" height="6" rx="3" fill="#ffffff" fill-opacity="0.6"/>
+            <circle cx="132" cy="72" r="26" fill="#e8fadf"/>
+            <path d="M122 72l7 7 14-14" stroke="#71dd37" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <div class="mini-stats">
+          <div class="card stat-box">
+            <div class="stat-icon" style="background:var(--primary-soft); color:var(--primary);">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="stat-num" id="statGuru">0</div>
+            <div class="stat-lbl">Jumlah Guru Mengunggah</div>
+          </div>
+
+          <div class="card stat-box">
+            <div class="stat-icon" style="background:var(--info-soft); color:var(--info);">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
+            <div class="stat-num" id="statMapel">0</div>
+            <div class="stat-lbl">Mata Pelajaran Terdata</div>
+          </div>
+
+          <div class="card stat-box">
+            <div class="stat-icon" style="background:var(--success-soft); color:var(--success);">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="stat-num" id="statDokumen">0</div>
+            <div class="stat-lbl">Total Dokumen Terupload</div>
+          </div>
+
+          <div class="card stat-box">
+            <div class="stat-icon" style="background:var(--warning-soft); color:var(--warning);">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="stat-num" id="statKoneksi" style="font-size:1.05rem; padding-top:0.25rem;">Sinkron...</div>
+            <div class="stat-lbl" id="statLastSync">Google Sheets Live</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BAGIAN 3 GRAFIK DINAMIS -->
+      <section id="section-grafik">
+        <div class="section-head">
+          <div>
+            <h2>Statistik & Grafik Kurikulum Smantib</h2>
+            <p>Data grafik otomatis diperbarui mengikuti perubahan pada Google Sheets</p>
+          </div>
+          <button class="btn btn-outline" onclick="muatData()">↻ Sinkronkan Grafik</button>
+        </div>
+
+        <div class="charts-grid">
+          <!-- GRAFIK 1: MATA PELAJARAN -->
+          <div class="card chart-card">
+            <h3 class="chart-title">Mata Pelajaran Terupload</h3>
+            <p class="chart-sub">Jumlah berkas berdasarkan mata pelajaran</p>
+            <div class="chart-canvas-wrap">
+              <canvas id="chartMapel"></canvas>
+              <div class="chart-empty-badge" id="emptyMapel"><span>Menunggu data di Google Sheet</span></div>
+            </div>
+          </div>
+
+          <!-- GRAFIK 2: KELENGKAPAN DOKUMEN -->
+          <div class="card chart-card">
+            <h3 class="chart-title">Kelengkapan Dokumen</h3>
+            <p class="chart-sub">Distribusi jenis & kelengkapan perangkat ajar</p>
+            <div class="chart-canvas-wrap">
+              <canvas id="chartKelengkapan"></canvas>
+              <div class="chart-empty-badge" id="emptyKelengkapan"><span>Menunggu data di Google Sheet</span></div>
+            </div>
+          </div>
+
+          <!-- GRAFIK 3: JUMLAH GURU -->
+          <div class="card chart-card">
+            <h3 class="chart-title">Jumlah Guru & Kontribusi</h3>
+            <p class="chart-sub">Jumlah dokumen yang diunggah per guru</p>
+            <div class="chart-canvas-wrap">
+              <canvas id="chartGuru"></canvas>
+              <div class="chart-empty-badge" id="emptyGuru"><span>Menunggu data di Google Sheet</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BAGIAN GALERI THUMBNAIL DOKUMEN -->
+      <section id="section-dokumen">
+        <div class="section-head">
+          <div>
+            <h2>Galeri Thumbnail Dokumen</h2>
+            <p>Klik pada gambar thumbnail untuk pratinjau langsung, atau unduh & bagikan tautan</p>
+          </div>
+          <button class="btn btn-soft-primary" onclick="bukaModalForm()">+ Tambah Dokumen</button>
+        </div>
+
+        <div class="docs-grid" id="daftarDokumen">
+          <div class="card" style="grid-column: 1 / -1; text-align:center; padding:2.5rem; color:var(--text-muted);">
+            Memuat data dokumen dari Google Sheets...
+          </div>
+        </div>
+      </section>
+
+      <!-- BAGIAN KOMENTAR -->
+      <section class="card" id="section-komentar">
+        <div class="section-head" style="margin-bottom:0.5rem;">
+          <div>
+            <h2>Diskusi & Komentar Kurikulum Smantib</h2>
+            <p>Ruang catatan evaluasi dan diskusi perangkat pembelajaran</p>
+          </div>
+        </div>
+        <div id="giscus-container">
+          <p style="font-size:0.84rem; color:var(--text-muted); margin:0;">
+            Area komentar siap dihubungkan dengan widget Giscus / Disqus repositori GitHub.
+          </p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- BOTTOM NAVIGATION KHUSUS HP -->
+  <nav class="mobile-bottom-nav">
+    <a href="#top" class="bottom-nav-item active" onclick="setBottomNav(this)">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span>Beranda</span>
+    </a>
+    <a href="#section-grafik" class="bottom-nav-item" onclick="setBottomNav(this)">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Grafik</span>
+    </a>
+    <button type="button" class="bottom-nav-item bottom-nav-upload" onclick="bukaModalForm()">
+      <span>+ Unggah</span>
+    </button>
+    <a href="#section-dokumen" class="bottom-nav-item" onclick="setBottomNav(this)">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>Dokumen</span>
+    </a>
+  </nav>
+
+  <!-- POP-UP MODAL 1: GOOGLE FORM UNGGAH DOKUMEN -->
+  <div class="modal-backdrop" id="modalForm" onclick="if(event.target===this) tutupModalForm()">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>📤 Unggah Dokumen — Kurikulum Smantib</h3>
+        <button class="modal-close" onclick="tutupModalForm()" title="Tutup">×</button>
+      </div>
+      <div class="modal-tip">
+        <span>Isi formulir di bawah ini. Jika kotak tidak tampil di browser, buka langsung lewat tombol di samping.</span>
+        <a href="https://forms.gle/q9xXkjH9Y435dJTa6" target="_blank" class="btn btn-soft-primary" style="padding:0.35rem 0.75rem; font-size:0.78rem;">↗ Buka Form di Tab Baru</a>
+      </div>
+      <div class="modal-body">
+        <iframe id="iframeGoogleForm" class="modal-iframe" src="" loading="lazy">Memuat Google Form...</iframe>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="tutupModalForm()">Selesai & Perbarui Grafik</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POP-UP MODAL 2: PRATINJAU THUMBNAIL DOKUMEN -->
+  <div class="modal-backdrop" id="modalPreview" onclick="if(event.target===this) tutupModalPreview()">
+    <div class="modal-dialog" style="max-width:900px;">
+      <div class="modal-header">
+        <h3 id="previewTitle">Pratinjau Dokumen</h3>
+        <button class="modal-close" onclick="tutupModalPreview()" title="Tutup">×</button>
+      </div>
+      <div class="modal-body">
+        <iframe id="iframePreviewDoc" class="modal-iframe" src="" allow="autoplay"></iframe>
+      </div>
+      <div class="modal-footer">
+        <a id="btnModalDownload" href="#" target="_blank" class="btn btn-primary">⬇ Download Dokumen</a>
+        <button class="btn btn-outline" onclick="tutupModalPreview()">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // KONFIGURASI LINK GOOGLE FORM & GOOGLE SHEETS KURIKULUM SMANTIB
+    // =========================================================================
+    // Catatan: Agar Google Form tampil penuh di dalam Pop-up tanpa diblokir browser,
+    // kamu bisa mengganti link di bawah dengan link Embed (<> / viewform?embedded=true)
+    const GOOGLE_FORM_EMBED_URL = "https://forms.gle/q9xXkjH9Y435dJTa6";
+    const SHEET_ID = "198dh9hp8BeRplSUdKYBlfwvWLZRG2xh-dpWKkhNRUUw";
+    const GOOGLE_SHEETS_CSV_URLS = [
+      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`,
+      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`
+    ];
+    // =========================================================================
+
+    let semuaCatatan = [];
+    let chartMapelInstance = null;
+    let chartKelengkapanInstance = null;
+    let chartGuruInstance = null;
+
+    // Navigasi & Pop-up Controls
+    function toggleSidebar(open) {
+      document.getElementById("sidebar").classList.toggle("open", open);
+      document.getElementById("sidebarBackdrop").classList.toggle("show", open);
+    }
+
+    function pilihMenu(el) {
+      document.querySelectorAll(".menu-item").forEach(i => i.classList.remove("active"));
+      if (el.parentElement) el.parentElement.classList.add("active");
+      toggleSidebar(false);
+    }
+
+    function setBottomNav(el) {
+      document.querySelectorAll(".bottom-nav-item").forEach(i => i.classList.remove("active"));
+      el.classList.add("active");
+    }
+
+    function bukaModalForm() {
+      const iframe = document.getElementById("iframeGoogleForm");
+      if (!iframe.src || iframe.src === window.location.href) {
+        iframe.src = GOOGLE_FORM_EMBED_URL;
+      }
+      document.getElementById("modalForm").classList.add("open");
+    }
+
+    function tutupModalForm() {
+      document.getElementById("modalForm").classList.remove("open");
+      muatData(); // Otomatis refresh grafik & dokumen setelah menutup form
+    }
+
+    function bukaModalPreview(title, previewUrl, downloadUrl) {
+      document.getElementById("previewTitle").textContent = title;
+      document.getElementById("iframePreviewDoc").src = previewUrl;
+      document.getElementById("btnModalDownload").href = downloadUrl;
+      document.getElementById("modalPreview").classList.add("open");
+    }
+
+    function tutupModalPreview() {
+      document.getElementById("modalPreview").classList.remove("open");
+      document.getElementById("iframePreviewDoc").src = "";
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        document.getElementById("searchInput").focus();
+      }
+      if (e.key === "Escape") {
+        tutupModalForm();
+        tutupModalPreview();
+      }
+    });
+
+    // Ambil CSV dari Google Sheets
+    async function ambilCSV() {
+      for (const baseUrl of GOOGLE_SHEETS_CSV_URLS) {
+        try {
+          const urlAntiCache = baseUrl + (baseUrl.includes("?") ? "&" : "?") + "t=" + Date.now();
+          const res = await fetch(urlAntiCache);
+          if (res.ok) {
+            const text = await res.text();
+            if (text && !text.trim().startsWith("<!DOCTYPE html")) {
+              return text;
+            }
+          }
+        } catch (e) {}
+      }
+      throw new Error("Gagal mengambil CSV");
+    }
+
+    // Muat Data & Bangun Grafik + Thumbnail
+    async function muatData() {
+      const btnRefresh = document.getElementById("btnRefresh");
+      const statKoneksi = document.getElementById("statKoneksi");
+      btnRefresh.classList.add("spin");
+
+      try {
+        const csvText = await ambilCSV();
+        const rows = parseCSV(csvText);
+
+        statKoneksi.textContent = "Terhubung";
+        statKoneksi.style.color = "var(--success)";
+        const now = new Date();
+        document.getElementById("statLastSync").textContent =
+          "Update " + now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+
+        semuaCatatan = [];
+        const mapelCounts = {};
+        const kelengkapanCounts = {};
+        const guruCounts = {};
+        let totalDokumenCount = 0;
+
+        if (rows.length > 1) {
+          const headers = rows[0].map(h => h.trim());
+          const headersLower = headers.map(h => h.toLowerCase());
+
+          // Deteksi otomatis indeks kolom Guru, Mata Pelajaran, dan Kelengkapan Dokumen
+          const idxGuru = headersLower.findIndex(h => h.includes("guru") || h.includes("nama") || h.includes("pengajar"));
+          const idxMapel = headersLower.findIndex(h => h.includes("mapel") || h.includes("mata pelajaran") || h.includes("pelajaran"));
+          const idxKelengkapan = headersLower.findIndex(h => h.includes("kelengkapan") || h.includes("jenis") || h.includes("kategori") || h.includes("perangkat"));
+
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (!row[0] && row.join("").trim() === "") continue;
+
+            const waktu = row[0] || "";
+            const textFields = [];
+            const fileItems = [];
+
+            let namaGuru = idxGuru > 0 && row[idxGuru] ? row[idxGuru].trim() : "";
+            let namaMapel = idxMapel > 0 && row[idxMapel] ? row[idxMapel].trim() : "";
+            let jenisDok = idxKelengkapan > 0 && row[idxKelengkapan] ? row[idxKelengkapan].trim() : "";
+
+            for (let c = 1; c < headers.length; c++) {
+              const val = (row[c] || "").trim();
+              const label = headers[c] || `Kolom ${c}`;
+              if (!val) continue;
+
+              if (val.includes("drive.google.com")) {
+                const parts = val.split(",");
+                parts.forEach((part, idx) => {
+                  const idMatch = part.match(/[-\w]{25,}/);
+                  if (idMatch) {
+                    const fileId = idMatch[0];
+                    totalDokumenCount++;
+                    fileItems.push({
+                      fileId,
+                      label: parts.length > 1 ? `${label} (${idx + 1})` : label,
+                      thumbUrl: `https://drive.google.com/thumbnail?id=${fileId}&sz=w600`,
+                      previewUrl: `https://drive.google.com/file/d/${fileId}/preview`,
+                      downloadUrl: `https://drive.google.com/uc?export=download&id=${fileId}`
+                    });
+                  }
+                });
+              } else {
+                textFields.push({ label, val });
+              }
+            }
+
+            // Fallback cerdas jika nama header form berbeda
+            if (!namaGuru && textFields.length > 0) namaGuru = textFields[0].val;
+            if (!namaMapel && textFields.length > 1) namaMapel = textFields[1].val;
+            if (!jenisDok) {
+              jenisDok = fileItems.length > 0 ? `Lengkap (${fileItems.length} File)` : "Belum Ada File";
+            }
+
+            if (namaGuru) guruCounts[namaGuru] = (guruCounts[namaGuru] || 0) + 1;
+            if (namaMapel) mapelCounts[namaMapel] = (mapelCounts[namaMapel] || 0) + 1;
+            if (jenisDok) kelengkapanCounts[jenisDok] = (kelengkapanCounts[jenisDok] || 0) + 1;
+
+            semuaCatatan.push({
+              id: `doc-${i}`,
+              waktu,
+              judul: namaMapel ? `${namaMapel} — ${namaGuru}` : (namaGuru || `Dokumen #${i}`),
+              guru: namaGuru || "Guru Smantib",
+              mapel: namaMapel || "Umum",
+              kelengkapan: jenisDok,
+              detail: textFields,
+              files: fileItems
+            });
+          }
+        }
+
+        semuaCatatan.reverse();
+
+        // Update Angka Ringkasan Atas
+        document.getElementById("statGuru").textContent = Object.keys(guruCounts).length;
+        document.getElementById("statMapel").textContent = Object.keys(mapelCounts).length;
+        document.getElementById("statDokumen").textContent = totalDokumenCount || semuaCatatan.length;
+
+        // Render 3 Grafik
+        renderGrafik(mapelCounts, kelengkapanCounts, guruCounts);
+
+        // Render Galeri Thumbnail
+        tampilkanThumbnailDokumen(semuaCatatan);
+
+      } catch (err) {
+        statKoneksi.textContent = "Cek Izin Sheet";
+        statKoneksi.style.color = "var(--danger)";
+        renderGrafik({}, {}, {});
+        document.getElementById("daftarDokumen").innerHTML = `
+          <div class="card" style="grid-column: 1 / -1; text-align:center; padding:2rem;">
+            <p style="margin:0 0 0.5rem; font-weight:600; color:var(--text-heading);">Belum dapat membaca Google Sheets</p>
+            <p style="margin:0; font-size:0.85rem; color:var(--text-muted);">
+              Pastikan akses Google Sheets diset ke <b>"Siapa saja yang memiliki link" (Viewer)</b> atau sudah di-<b>Publish to web</b>.
+            </p>
+          </div>`;
+      } finally {
+        btnRefresh.classList.remove("spin");
+      }
+    }
+
+    function renderGrafik(mapelCounts, kelengkapanCounts, guruCounts) {
+      const palette = ["#696cff", "#03c3ec", "#71dd37", "#ffab00", "#ff3e1d", "#8592a3", "#20c997", "#fd7e14"];
+
+      // 1. Grafik Mata Pelajaran
+      const mapelLabels = Object.keys(mapelCounts);
+      const mapelValues = Object.values(mapelCounts);
+      document.getElementById("emptyMapel").style.display = mapelLabels.length ? "none" : "flex";
+
+      if (chartMapelInstance) chartMapelInstance.destroy();
+      chartMapelInstance = new Chart(document.getElementById("chartMapel"), {
+        type: "bar",
+        data: {
+          labels: mapelLabels.length ? mapelLabels : ["Belum Ada Data"],
+          datasets: [{
+            label: "Dokumen Terupload",
+            data: mapelValues.length ? mapelValues : [0],
+            backgroundColor: "#696cff",
+            borderRadius: 6,
+            maxBarThickness: 36
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: "#f0f2f5" } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // 2. Grafik Kelengkapan Dokumen
+      const kelLabels = Object.keys(kelengkapanCounts);
+      const kelValues = Object.values(kelengkapanCounts);
+      document.getElementById("emptyKelengkapan").style.display = kelLabels.length ? "none" : "flex";
+
+      if (chartKelengkapanInstance) chartKelengkapanInstance.destroy();
+      chartKelengkapanInstance = new Chart(document.getElementById("chartKelengkapan"), {
+        type: "doughnut",
+        data: {
+          labels: kelLabels.length ? kelLabels : ["Kosong"],
+          datasets: [{
+            data: kelValues.length ? kelValues : [1],
+            backgroundColor: kelLabels.length ? palette : ["#eceef1"],
+            borderWidth: 2,
+            borderColor: "#ffffff"
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: "66%",
+          plugins: {
+            legend: {
+              display: kelLabels.length > 0,
+              position: "bottom",
+              labels: { boxWidth: 12, font: { size: 11 } }
+            },
+            tooltip: { enabled: kelLabels.length > 0 }
+          }
+        }
+      });
+
+      // 3. Grafik Jumlah Guru
+      const guruLabels = Object.keys(guruCounts);
+      const guruValues = Object.values(guruCounts);
+      document.getElementById("emptyGuru").style.display = guruLabels.length ? "none" : "flex";
+
+      if (chartGuruInstance) chartGuruInstance.destroy();
+      chartGuruInstance = new Chart(document.getElementById("chartGuru"), {
+        type: "bar",
+        data: {
+          labels: guruLabels.length ? guruLabels : ["Belum Ada Guru"],
+          datasets: [{
+            label: "Jumlah Unggahan",
+            data: guruValues.length ? guruValues : [0],
+            backgroundColor: "#03c3ec",
+            borderRadius: 6,
+            maxBarThickness: 28
+          }]
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: "#f0f2f5" } },
+            y: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function tampilkanThumbnailDokumen(list) {
+      const container = document.getElementById("daftarDokumen");
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="grid-column: 1 / -1; text-align:center; padding:2.75rem 1.25rem;">
+            <div style="font-size:2rem; margin-bottom:0.5rem;">📂</div>
+            <h3 style="margin:0 0 0.4rem; color:var(--text-heading);">Belum Ada Dokumen yang Diunggah</h3>
+            <p style="margin:0 0 1.15rem; font-size:0.88rem; color:var(--text-muted);">
+              Klik tombol di bawah untuk mengisi Google Form. Dokumen akan otomatis tampil sebagai kartu thumbnail di sini.
+            </p>
+            <button class="btn btn-primary" onclick="bukaModalForm()">+ Unggah Dokumen Pertama</button>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(item => {
+        const primaryFile = item.files[0];
+        const thumbSection = primaryFile
+          ? `<div class="thumb-preview" onclick="bukaModalPreview('${escapeAttr(item.judul)}', '${primaryFile.previewUrl}', '${primaryFile.downloadUrl}')">
+              <span class="thumb-badge">${escapeHTML(item.mapel)}</span>
+              <img src="${primaryFile.thumbUrl}" alt="Thumbnail ${escapeAttr(item.judul)}"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+              <div class="thumb-fallback" style="display:none;">
+                <svg width="42" height="42" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span style="font-size:0.8rem; font-weight:600;">Klik untuk Pratinjau Dokumen</span>
+              </div>
+              <div class="thumb-overlay-btn">
+                <span class="btn btn-primary">👁 Pratinjau Halaman</span>
+              </div>
+            </div>`
+          : `<div class="thumb-preview" style="cursor:default;">
+              <span class="thumb-badge">${escapeHTML(item.mapel)}</span>
+              <div class="thumb-fallback">
+                <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span style="font-size:0.78rem; color:var(--text-muted);">Catatan Tanpa Lampiran File</span>
+              </div>
+            </div>`;
+
+        const detailRows = item.detail.slice(0, 3).map(d => `
+          <div class="thumb-detail-row">
+            <strong>${escapeHTML(d.label)}:</strong> ${escapeHTML(d.val)}
+          </div>
+        `).join("");
+
+        const actionBtns = primaryFile
+          ? `<button class="btn btn-soft-info" onclick="bukaModalPreview('${escapeAttr(item.judul)}', '${primaryFile.previewUrl}', '${primaryFile.downloadUrl}')">👁 Lihat</button>
+             <a href="${primaryFile.downloadUrl}" target="_blank" class="btn btn-primary">⬇ Unduh</a>`
+          : `<span class="btn btn-outline" style="grid-column: span 2; opacity:0.6; cursor:default;">Tidak Ada File</span>`;
+
+        return `
+          <article class="thumb-card" id="${item.id}">
+            ${thumbSection}
+            <div class="thumb-body">
+              <div class="thumb-meta">
+                <span>👤 ${escapeHTML(item.guru)}</span>
+                <span>${escapeHTML(item.waktu.split(" ")[0] || "")}</span>
+              </div>
+              <h3 class="thumb-title">${escapeHTML(item.judul)}</h3>
+              <div class="thumb-details">${detailRows}</div>
+              <div class="thumb-actions">
+                ${actionBtns}
+                <button class="btn btn-outline" onclick="bagikanCatatan('${item.id}', '${escapeAttr(item.judul)}')" title="Bagikan Link">🔗</button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function filterCatatan() {
+      const q = document.getElementById("searchInput").value.toLowerCase();
+      const hasil = semuaCatatan.filter(item =>
+        item.judul.toLowerCase().includes(q) ||
+        item.guru.toLowerCase().includes(q) ||
+        item.mapel.toLowerCase().includes(q) ||
+        item.detail.some(d => d.val.toLowerCase().includes(q))
+      );
+      tampilkanThumbnailDokumen(hasil);
+    }
+
+    function bagikanCatatan(id, judul) {
+      const url = `${window.location.origin}${window.location.pathname}#${id}`;
+      if (navigator.share) {
+        navigator.share({ title: `Kurikulum Smantib — ${judul}`, url });
+      } else {
+        navigator.clipboard.writeText(url);
+        alert("Tautan dokumen berhasil disalin:\n" + url);
+      }
+    }
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [], cell = "", inQuotes = false;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i], next = text[i + 1];
+        if (inQuotes) {
+          if (ch === '"' && next === '"') { cell += '"'; i++; }
+          else if (ch === '"') { inQuotes = false; }
+          else { cell += ch; }
+        } else {
+          if (ch === '"') { inQuotes = true; }
+          else if (ch === ',') { row.push(cell); cell = ""; }
+          else if (ch === '\n' || (ch === '\r' && next === '\n')) {
+            row.push(cell); rows.push(row); row = []; cell = "";
+            if (ch === '\r') i++;
+          } else { cell += ch; }
+        }
+      }
+      if (cell.length > 0 || row.length > 0) { row.push(cell); rows.push(row); }
+      return rows;
+    }
+
+    function escapeHTML(str) {
+      return String(str).replace(/[&<>'"]/g, t => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[t]));
+    }
+    function escapeAttr(str) {
+      return escapeHTML(str).replace(/\n/g, " ");
+    }
+
+    // Sinkronisasi awal + cek otomatis tiap 45 detik jika tab aktif
+    muatData();
+    setInterval(() => {
+      if (!document.hidden) muatData();
+    }, 45000);
+  </script>
+</body>
+</html>
